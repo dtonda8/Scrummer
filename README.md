@@ -1,6 +1,6 @@
 # Scrummer
-Repo copy of FIT2101 project
-Link to live website: https://fit2101-scrummer.vercel.app
+- This is a copy of the original repo from gitlab
+- Link to live website: https://fit2101-scrummer.vercel.app/login/
 
 #### Home Screen
 ![Home Screen](SCR-20240222-pkos.png)
