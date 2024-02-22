@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Velocity Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="velocity-chart-container" style="position: relative; width: 80vw; height: 80vh;">
+        <h2>Velocity Chart</h2>
+        <canvas id="velocity-chart"></canvas>
+    </div>
+
+    <script>
+        // Javascript Chart help from here: https://www.chartjs.org/docs/latest/getting-started/usage.html
+        var sprintData = JSON.parse('{{ sprint_data|escapejs }}');
+
+        // Draws a bar graph of committed and completed tasks against each sprint (5 most recent in chronological order - can be changed in views.py)
+        var velocityChart = new Chart(document.getElementById('velocity-chart').getContext('2d'), {
+            type: 'bar',
+
+            data: {
+                labels: sprintData.map(item => item.sprint_title),
+                datasets: [
+                    {
+                        label: 'Committed Tasks',
+                        data: sprintData.map(item => item.total_tasks),
+                        backgroundColor: '#CCCCCC',
+                    },
+                    {
+                        label: 'Completed Tasks',
+                        data: sprintData.map(item => item.completed_tasks),
+                        backgroundColor: '#40BF73',
+                    },
+                ],
+            },
+
+            // Styling help from here: https://stackoverflow.com/a/68022571
+            options: {
+                indexAxis: 'x', // Horizontal bar graph
+                barPercentage: 1, // Bar thickness: 100% -> no gaps between bars.
+                categoryPercentage: 0.5, // Controls width of the two bars for each sprint. keep below 100% so that each sprint is distinct.
+
+                plugins: {
+                    legend: {
+                        labels: {
+                        color: "#191919", 
+                        font: { size: 16 }
+                        }
+                    }
+
+                },
+
+                scales: {
+                    y: {  
+                        ticks: {
+                        color: "#191919", 
+                        font: { size: 16 },
+                        stepSize: 1,
+                        beginAtZero: true
+                        }
+                    },
+                    x: {  
+                        ticks: {
+                        color: "#191919", 
+                        font: { size: 12 },
+                        stepSize: 1,
+                        beginAtZero: true
+                        }
+                    }
+                },
+            },
+
+        });
+    </script>
+</body>
+</html>

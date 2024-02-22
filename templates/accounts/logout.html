@@ -1,0 +1,12 @@
+{% extends "base_loggedout.html" %} {% block content %}
+
+<div class="container">
+    <div class="form__container">
+        <h2 class="loggedout">You're no longer logged in</h2>
+        <button onclick="window.location = '/login'" class="button">
+            Go to Login
+        </button>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base_loggedin.html" %} {% block content %}
+
+<div class="centred">
+    <div class="form__container">
+        <style>body{background-color: rgb(186, 161, 106)};</style>
+        <h3>{{ task.title }} details</h3>
+        
+
+        <div class="form__group">
+            <label>Description:</label>
+            <span>{{ task.description }}</span>
+        </div>
+
+        <div class="form__group">
+            <label>Priority:</label>
+            
+            <span>{{ task.get_priority_display }}</span>
+        </div>
+
+        <div class="form__group">
+            <label>Status:</label>
+            <span>{{ task.get_status_display }}</span>
+        </div>
+
+        <div class="form__group">
+            <label>Tag:</label>
+            <span>{{ task.get_tag_display }}</span>
+        </div>
+        <div class="form__group">
+            <label>Points:</label>
+            <span>{{ task.get_points_display }}</span>
+        </div>
+        <div class="form__group">
+            <label>Assignee:</label>
+            <span>{{ task.assignee }}</span>
+        </div>
+
+        <div class="form__group">
+            <label>Location:</label>
+            <span>
+                {% if task.list %} {{ task.list }} ({{ task.list.board }})
+                {%else %} None {% endif %}
+            </span>
+        </div>
+
+        <div class="form__group">
+            <label>Completion Date:</label>
+            <span>
+                {% if task.completion_date %} {{ task.completion_date }}
+                {%else %} None {% endif %}
+            </span>
+        </div>
+
+        <div class="form__group">
+            <label>Hours Spent So Far:</label>
+            <span>
+                {{ task.hours_spent }}
+            </span>
+        </div>
+
+        <div class="form__group">
+            <label>Expected Hours Spent:</label>
+            <span>
+                {{ task.expected_hours }}
+            </span>
+        </div>
+
+        <div class="form__actions">
+            <a
+                {% if task.list %}
+                href="{% url 'single_board' task.list.board.id %}"
+                {%else %} 
+                href="{% url 'index'%}"
+                {% endif %}
+                type="button"
+                class="button button__transparent"
+            >
+                Back
+            </a>
+            <a
+                href="{% url 'delete_task' task.id %}"
+                type="button"
+                class="button button__danger"
+            >
+                Delete
+            </a>
+            <a
+                href="{% url 'edit_task' task.id %}"
+                type="button"
+                class="button"
+            >
+                Edit
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

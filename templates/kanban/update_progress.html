@@ -1,0 +1,39 @@
+{% extends "base_loggedin.html" %} {% block content %}
+<div class="centred">
+    <form method="post" class="form__container">
+        <h3>View/Edit Your Individual Progress</h3>
+        
+        {% csrf_token %} 
+        <div>
+            {% for sp in sprint_participation %}
+                <h4>{{ sp.sprint }}</h4>
+                {% for day_num, hours in sp.daily_progress.items %}
+                    <!-- Create form input -->
+                    <div class="form__group">
+                    <label for="id_daily_progress_{{ day_num }}_{{ sp.sprint.id }}">Day {{ day_num }}</label>
+                    <input 
+                    type="number" name="daily_progress_{{ day_num }}_{{ sp.sprint.id }}" 
+                    value="{{ hours }}" id="id_daily_progress_{{ day_num }}_{{ sp.sprint.id }}" min="0" max="1000">
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <div class="form__actions">
+            <a
+                href="{% url 'index' %}"
+                type="button"
+                class="button button__warning"
+            >
+                Cancel
+            </a> 
+            <button
+            type="submit"
+            class="button"
+            >
+                Save
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

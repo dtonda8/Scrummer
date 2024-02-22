@@ -1,0 +1,22 @@
+{% extends "base_loggedin.html" %} {% block content %}
+<div class="centred">
+    <form method="post" class="form__container">
+        {% csrf_token %}
+        <h3>Are you sure you want to delete "{{ task.title }}"?</h3>
+        <div class="form__actions">
+            <a
+                {% if task.list %}
+                href="{% url 'single_board' task.list.board.id %}"
+                {%else %} 
+                href="{% url 'index'%}"
+                {% endif %}
+                type="button"
+                class="button button__transparent"
+            >
+                Cancel
+            </a>
+            <button type="submit" class="button button__danger">Delete</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

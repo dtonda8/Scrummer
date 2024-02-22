@@ -1,0 +1,85 @@
+{% for list, tasks in list_to_task.items %}
+    <div class="list" data-id="{{ list.id }}" style="border: 1px solid #E0E0E0; border-radius: 10px">
+        <input type="hidden" name="list_order" value="{{ list.id }}">
+        <div class="list__title__row">
+            <div class="list__title">
+                <h5>{{ list.title }}</h5>
+            </div>
+            {% if not board.is_after_end_date %}
+                <div class="list-actions">
+                    <a href="{% url 'edit_list' board_id=board.id list_id=list.id %}" class="btn button__warning">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                    </a>
+                    <a href="{% url 'delete_list' board_id=board.id list_id=list.id %}" class="btn button__danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                        </svg>
+                    </a>
+                    <svg class="handle" xmlns="http://www.w3.org/2000/svg" width="30px" height="24px" fill="currentColor" class="bi bi-arrows-move" viewBox="-2 0 16 16">
+                        <path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10zM.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8z"/>
+                    </svg>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div
+            class="tasks"
+            {% if not board.is_after_end_date %}
+                dropzone
+                ondragover="allowDrop(event)"
+                ondrop="drop(event, this)"
+                ondragenter="dragEnter(event)"
+                ondragleave="dragLeave(event)"
+            {% endif %}
+        >
+            {% for task in tasks %}
+
+            <div
+            {% if not board.is_after_end_date %}
+                draggable
+                ondragstart="drag(event)" 
+                id="{{ task.id }}"
+            {% endif %}
+            
+            >
+                <a
+                {% if board.is_after_end_date %}
+                    draggable="false"
+                {% endif %}
+                href="/task/{{ task.id }}" class="card__link">
+                    <div class="list__card">
+                        <div class="task__top__row">
+                            <h6>{{ task.title }}</h6>
+                            <span
+                                class="task__priority"
+                                priority="{{ task.priority }}"
+                                >{{ task.get_priority_display }}</span
+                            >
+                        </div>
+                        <div class="task__middle__row">
+                            <span class="desc__preview">{{ task.description }} </span>
+                            {% if task.tag != "None" %}
+                            <span class="task__tag"
+                                >{{ task.get_tag_display }}</span
+                            >
+                            {% endif %}
+                        </div>
+                        <div class="task__bottom__row">
+                            <span class="task__assignee"
+                                >Assigned to: {{ task.assignee }}</span
+                            >
+                            <span
+                                class="task__status"
+                                status="{{ task.status }}"
+                                >{{ task.get_status_display }}</span
+                            >
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}

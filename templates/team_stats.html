@@ -1,0 +1,198 @@
+{% extends "base_loggedin.html" %}
+{% block content %}
+    <div class="title__row" style="margin-left: 15px;"> 
+        <h1>Team Statistics</h1>
+        <button button type="button" class="btn btn-secondary" 
+        data-bs-toggle="dropdown" aria-expanded="false" 
+        data-bs-auto-close="outside">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" 
+            height="24" fill="currentColor" class="bi bi-filter" 
+            viewBox="0 0 16 16">
+            <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+        </svg>
+        </button>
+        <form class="dropdown-menu p-4" method="get" style="max-width: 210px;">
+            {% for field in sprint_filter.form %}
+    
+            <div class="form__group mb-3">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+            </div>
+    
+            {% endfor %}
+            <div class="form__group mb-3">
+                <label for="week_num_input">Week number</label>
+                <input id="week_num_input" type="number" name="week_number" min="1" value=""/>
+            </div>
+    
+            <div style="display: flex; justify-content: space-around;">
+                <button class="icon button" type="submit" >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="-1 0 18 18">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </button>
+                <a class="icon button" type="submit" href="{% url 'team_statistics' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="-1 0 18 18">
+                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg>
+                </a>
+            </div>
+        </form>
+    </div>
+    <div >
+        <p class="average-text" style="margin-left: 15px;" >Average time per day per member: {{ average_time_per_day_per_member }} hours</p>
+    </div>
+    <div>
+        <p class="average-text" style="margin-left: 15px;" >Team average for selected users: {{ entire_team_average }} hours</p>
+    </div>
+    <div style="padding: 0 32px">
+        <div class="title__row">
+            {% if form_error %}
+            <h5>Note: {{ form_error }}</h5>
+            {% endif %}
+        </div>
+        <div id="chartContainer1" style="height: 300px; width: 100%;"></div>
+        <div class="title__row">
+            {% if burndown_form_error %}
+            <h5>Note: {{ burndown_form_error }}</h5>
+            {% endif %}
+        </div>
+        <div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+    </div>
+
+    <head>
+        {% load bootstrap5 %}
+        {% bootstrap_css %}
+        {% bootstrap_javascript %}
+        <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script type="text/javascript">
+    
+    window.onload = function () {
+        var time_spent_data = JSON.parse('{{ time_spent_data|escapejs }}');
+        var title = '{{ title }}';
+        var axisXTitle = '{{ axisX_title }}';
+        var axisYTitle = '{{ axisY_title }}';
+        var stripLinesDict = JSON.parse("{{ stripLines|escapejs }}");
+        const dataPoints = [];
+        Object.keys(time_spent_data).forEach((key) => {
+            const value = time_spent_data[key];
+            dataPoints.push({ label: key, y: value });
+        })
+        var chart = new CanvasJS.Chart("chartContainer1", {
+            title:{
+                text: title,
+                fontFamily: "Arial",   
+                fontWeight: "bold",
+                fontSize: 30,
+                horizontalAlign: "center",     
+                padding: {
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 55
+                },  
+            },
+            axisX:{
+                title:axisXTitle,
+                },
+            axisY:{
+                title:axisYTitle,
+                stripLines: [stripLinesDict],
+                },
+            data: [              
+            {
+                type: "column",
+                dataPoints: dataPoints
+            }
+            ]
+        });
+        chart.render();
+                
+        var dayToStoryIdeal = JSON.parse('{{ day_to_story_points_ideal|escapejs }}');
+        var dayToStoryActual = JSON.parse('{{ day_to_story_points_actual|escapejs }}');
+        var burndownTitle = '{{ burndown_title }}';
+        
+        const dataPoints1 = [];
+        Object.keys(dayToStoryIdeal).forEach((key) => {
+            const value = dayToStoryIdeal[key];
+            dataPoints1.push({ label: key, y: value });
+        })
+
+        const dataPoints2 = [];
+        Object.keys(dayToStoryActual).forEach((key) => {
+            const value = dayToStoryActual[key];
+            dataPoints2.push({ label: key, y: value });
+        })
+        var chart1 = new CanvasJS.Chart("chartContainer2", {
+            animationEnabled: true,
+            theme: "light2",
+            title:{
+                text: burndownTitle, 
+                fontFamily: "Arial",   
+                fontSize: 30,
+                fontWeight: "bold",
+                padding: {
+                    top: 1,
+                    right: 1,
+                    bottom: 2,
+                    left: 55
+                }, 
+            },
+            axisX:{
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                },
+                title: "Days",
+            },
+            axisY:{
+                title: "Story Points Remaining",
+                includeZero: false,
+                crosshair: {
+                    enabled: true,
+                    snapToDataPoint: true
+                }
+            },
+            toolTip:{
+                shared:true
+            },  
+            legend:{
+                cursor:"pointer",
+                verticalAlign: "bottom",
+                dockInsidePlotArea: true,
+                itemclick: toogleDataSeries
+            },
+            data: [{
+                type: "line",
+                showInLegend: true,
+                name: "Ideal Remaining",
+                markerType: "square",
+                // xValueFormatString: "DD MMM, YYYY",
+                color: "#F08080",
+                dataPoints: dataPoints1
+            },
+            {
+                type: "line",
+                showInLegend: true,
+                name: "Actual Remaining",
+                lineDashType: "dash",
+                dataPoints: dataPoints2
+            }]
+        });
+        chart1.render();
+        
+        function toogleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            } else{
+                e.dataSeries.visible = true;
+            }
+            chart1.render();
+        }
+        
+    }
+    </script>
+    </head>
+{% endblock %}
+

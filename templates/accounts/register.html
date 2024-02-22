@@ -1,0 +1,43 @@
+{% extends "base_loggedout.html" %} {% load static %} {% block content %}
+
+<body class="login">
+    <div class="container">
+        <form
+            method="post"
+            class="form__container"
+            action="{% url 'register' %}"
+        >
+            <h2>Register</h2>
+            {% csrf_token %} {% for input in form %}
+            <div class="form__group">
+                <label>{{ input.label_tag }}</label>
+                {{ input }} {{ input.errors }}
+                <span class="helptext">{{ input.help_text }}</span>
+                {{ input.errors }}
+            </div>
+            {% endfor %}
+
+            <div class="form__actions">
+                <a
+                    href="{% url 'login'%}"
+                    type="button"
+                    class="button button__transparent"
+                >
+                    Back
+                </a>
+                <button type="submit" class="button">Register</button>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+        {% if form.errors %}
+
+        <div class="form__container form__message form__error">
+            {{ form.non_field_errors|striptags }}
+        </div>
+
+        {% endif %}
+    </div>
+</body>
+
+{% endblock content %}

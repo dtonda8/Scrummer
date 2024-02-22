@@ -1,0 +1,58 @@
+{% load static %} {% load user_has_group %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Scrummer</title>
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="{% static 'css/main.css' %}"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="Scrummer is a simple kanban project management tool"
+        />
+        <script src="https://unpkg.com/htmx.org@1.1.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    </head>
+    <header>
+        <nav class="start">
+            <a href="{% url 'index' %}">Home</a>
+        </nav>
+        <nav class="end">
+            <span class="loggedin__user"
+                >Logged in as {{ request.user.username }}</span
+            >
+            {% if request.user|user_has_group:"ADMIN" %}
+            <a href="{% url 'admin:index' %}">Admin</a>
+            {% endif %}
+            <a href="{% url 'admin:logout' %}">Logout</a>
+        </nav>
+    </header>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <div class="main__container">
+            {% block content %} {% endblock content %}
+        </div>
+        {% block main %}{% endblock %}
+        <script src="https://unpkg.com/htmx.org@1.1.0"></script>
+        <script>
+            document.body.addEventListener("htmx:configRequest", (event) => {
+                event.detail.headers["X-CSRFToken"] = "{{ csrf_token }}";
+            });
+            htmx.onLoad(function (content) {
+                var sortables = content.querySelectorAll(".sortable");
+                for (var i = 0; i < sortables.length; i++) {
+                    var sortable = sortables[i];
+                    new Sortable(sortable, {
+                        handle: ".handle",
+                        animation: 150,
+                        ghostClass: "blue-background-class",
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>

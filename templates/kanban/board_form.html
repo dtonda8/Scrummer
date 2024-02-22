@@ -1,0 +1,50 @@
+{% extends "base_loggedin.html" %} {% block content %}
+<div class="centred">
+    <form method="post" class="form__container">
+        <h3>
+            {% if new %}
+                New Board
+            {% else %}
+                Edit: {{ board.title }}
+            {% endif %}
+        </h3>
+        {% csrf_token %} {% for field in form %}
+
+        <div class="form__group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+        </div>
+
+        {% endfor %}
+
+        {% if form.errors %}
+        <div>
+            {{ form.non_field_errors|striptags }}
+        </div>
+        {% elif next %}
+        <div>
+            Please login to see this page.
+        </div>
+        {% endif %}
+        <div class="form__actions">
+            <a
+                {% if new %}
+                    href="{% url 'index' %}"
+                {% else %}
+                    href="{% url 'single_board' board.id %}"
+                {% endif %}
+                type="button"
+                class="button button__warning"
+            >
+                Cancel
+            </a>
+            <button
+            type="submit"
+            class="button"
+            >
+                Save
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

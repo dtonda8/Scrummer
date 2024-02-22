@@ -1,0 +1,107 @@
+{% extends "base_loggedin.html" %} {% block content %}
+{% load static %} {% load user_has_group %} {% load get_property %}
+
+<style>
+    body{
+        
+        background-image: url('https://images.unsplash.com/photo-1515229144611-617d3ce8e108?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80');
+        background-size: cover;
+
+    }
+</style>
+<div class="product__page">
+    <div class="list product__backlog">
+        <div class="list__title__row">
+            <h3 style="color: #fff;">Product Backlog</h3>
+        </div>
+        <div class="index__tasks">
+            {% for task in tasks %}
+            <div id="{{ task.id }}">
+                <a
+                    draggable="false"
+                    href="/task/{{ task.id }}"
+                    class="card__link"
+                >
+                    <div class="card">
+                        <div class="task__top__row">
+                            <h4>{{ task.title }}</h4>
+                            <span
+                                class="task__priority"
+                                priority="{{ task.priority }}"
+                                >{{ task.get_priority_display }}</span
+                            >
+                        </div>
+                        <div class="task__middle__row">
+                            <span class="desc__preview">{{ task.description }} </span>
+                            {% if task.tag != "None" %}
+                            <span class="task__tag"
+                                >{{ task.get_tag_display }}</span
+                            >
+                            {% endif %}
+                        </div>
+                        <div class="task__bottom__row">
+                            <span class="task__assignee"
+                                >Assigned to: {{ task.assignee }}</span
+                            >
+                            <span
+                                class="task__status"
+                                status="{{ task.status }}"
+                                >{{ task.get_status_display }}</span
+                            >
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="boards__container">
+        <div class="list__title__row">
+            <h3 style="color: #fff;">Sprints</h3>
+            <div>
+                <div class="button-container">
+                <a class="button" href="{% url 'create_board' %}">Create Sprint</a>
+                {% if request.user|user_has_group:"ADMIN" %}
+                <a class="button" href="{% url 'velocity_chart' %}">Velocity Chart</a>
+                <a class="button" href="{% url 'team_statistics' %}">Team Statistics</a>
+                {% endif %}
+                <a class="button" href="{% url 'update_progress' %}">Update My Progress</a>
+                </div>
+                
+            </div>
+        </div>
+        <div class="boards">
+            {% for board in boards %}
+                <div class="board">
+                    <a
+                    draggable="false"
+                    href="/sprint/{{ board.id }}"
+                    class="card__link"
+                    >
+                        <div class="card board__card">
+                            <h3>{{ board.title }}</h3>
+                            <span>Number of lists: {{ board_stats|get_property:board.id|get_property:'amount_of_lists' }}</span>
+                            <span>Number of tasks: {{ board_stats|get_property:board.id|get_property:'amount_of_tasks' }}</span>
+                            <br>
+                            <span>Tasks todo: {{ board_stats|get_property:board.id|get_property:'amount_of_tasks_todo' }}</span>
+                            <span>Tasks doing: {{ board_stats|get_property:board.id|get_property:'amount_of_tasks_doing' }}</span>
+                            <span>Tasks done: {{ board_stats|get_property:board.id|get_property:'amount_of_tasks_done' }}</span>
+                            <br>
+                            <div class="status__row">
+                                <span class="end italic task__assignee">{{ board.start_date }} - {{ board.end_date }}</span>
+                                {% if board.is_active %}
+                                    <span class="task__status" status="IP">Active</span>
+                                {% elif board.is_before_start_date %}
+                                    <span class="task__status" status="NS">Before Start Date</span>
+                                {% elif board.is_after_end_date %}
+                                    <span class="task__status" status="CP">After End Date</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %} {% endblock %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,194 @@
+{% extends "base_loggedin.html" %} {% load static %} {% block content %}
+<head>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+</head>
+<div class="title__row">
+    <div style="width: fit-content;">
+        <h3>Tasks for {{ board.title }}</h3>
+        {% if board.is_after_end_date %}
+        <span class="board__status">Past end date</span>
+        {% endif %}
+    </div>
+    <div class="board__title__row">
+        {% if board.is_active %}
+        <a class="button" href="{% url 'create_task' board.id %}" 
+            >Create Task</a>
+        {% endif %}
+        <!-- <a class="button me-2" href="?view_mode=kanban">Kanban View</a>
+        <a class="button me-2" href="?view_mode=list">List View</a> -->
+        <!-- <a class="button" href="{% url 'single_board' board.id 'kanban' %}">Kanban View</a>
+        <a class="button" href="{% url 'single_board' board.id 'list' %}">List View</a> -->
+        <div class="dropstart" style="display:block">
+            <button button type="button" class="btn btn-secondary" 
+                data-bs-toggle="dropdown" aria-expanded="false" 
+                data-bs-auto-close="outside">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" 
+                    height="24" fill="currentColor" class="bi bi-filter" 
+                    viewBox="0 0 16 16">
+                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+            </button>
+            <form class="dropdown-menu p-4" method="get" style="max-width: 210px;">
+                {% for field in taskFilter.form %}
+
+                <div class="form__group mb-3">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                </div>
+
+                {% endfor %}
+                <div style="display: flex; justify-content: space-around;">
+                    <button class="icon button" type="submit" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="-1 0 18 18">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                    </button>
+                    <a class="icon button" type="submit" href="{% url 'single_board' board.id %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="-1 0 18 18">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                    </a>
+                </div>
+            </form>
+          </div>
+
+        <div class="dropdown">
+            <button class="btn btn-secondary " type="button" 
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 20">
+                    <path 
+                    fill-rule="evenodd" 
+                    d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+                </svg>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item option "href="{% url 'single_board' board.id 'kanban' %}"
+                    >Switch to Kanban View</a>
+                </li>
+                <li>
+                    <a class="dropdown-item option "href="{% url 'single_board' board.id 'list' %}"
+                    >Switch to List View</a>
+                </li>
+                <div class="dropdown-divider"></div>
+                <li>
+                    <a class="dropdown-item option "href="{% url 'create_list' board.id %}"
+                    >Create List</a>
+                </li>
+                <div class="dropdown-divider"></div>
+                <li>
+                    <a class="dropdown-item option" href="{% url 'edit_board' board.id %}"
+                    >Edit Sprint</a>
+                </li>
+                <li>
+                    <a class="dropdown-item option__danger "href="{% url 'delete_board' board.id %}"
+                    >Delete Sprint</a>
+                </li>
+            </ul>
+          </div>
+    </div>
+</div>
+
+{% if view_mode == "kanban" %}
+<div class="lists" id="kanban-lists">
+    <div class="list product__backlog">
+        <div class="list__title__row">
+            <h5>Product Backlog</h5>
+        </div>
+        <div class="tasks"
+           {% if not board.is_after_end_date %}
+                dropzone
+                ondragover="allowDrop(event)"
+                ondrop="drop(event, this)"
+                ondragenter="dragEnter(event)"
+                ondragleave="dragLeave(event)"
+            {% endif %}
+        >
+            {% for task in product_backlog %}
+            <div draggable ondragstart="drag(event)" id="{{ task.id }}">
+                <a href="/task/{{ task.id }}" class="card__link">
+                    <div class="list__card">
+                        <div class="task__top__row">
+                            <h6>{{ task.title }}</h6>
+                            <span
+                                class="task__priority"
+                                priority="{{ task.priority }}"
+                                >{{ task.get_priority_display }}</span
+                            >
+                        </div>
+                        <div class="task__middle__row">
+                            <span class="desc__preview">{{ task.description }} </span>
+                            {% if task.tag != "None" %}
+                            <span class="task__tag"
+                                >{{ task.get_tag_display }}</span
+                            >
+                            {% endif %}
+                        </div>
+                        <div class="task__bottom__row">
+                            <span class="task__assignee"
+                                >Assigned to: {{ task.assignee }}</span
+                            >
+                            <span
+                                class="task__status"
+                                status="{{ task.status }}"
+                                >{{ task.get_status_display }}</span
+                            >
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% if not board.is_after_end_date %}
+        <form class="sortable" hx-post="{% url 'sort' board_id=board.id %}" hx-trigger="end" hx-target="this" style="display: flex; align-items: flex-start; gap: 10px; height: 100%;">
+    {% endif %}
+    
+    {% include 'kanban/board_lists.html' %}
+    
+    {% if not board.is_after_end_date %}
+        <form>
+    {% endif %}
+</div>
+{% endif %}
+
+{% if view_mode == "list" %}
+    <!-- List view -->
+    <div class="lists">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Priority</th>
+                    <th>Description</th>
+                    <th>Tag</th>
+                    <th>Assignee</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for list_title, tasks in list_to_task.items %}
+                {% for task in tasks %}
+                <tr>
+                    <td><a href="/task/{{ task.id }}">{{ task.title }}</a></td>
+                    <td>{{ task.get_priority_display }}</td>
+                    <td>{{ task.description }}</td>
+                    <td>{{ task.get_tag_display }}</td>
+                    <td>{{ task.assignee }}</td>
+                    <td>{{ task.get_status_display }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<script>
+    const csrftoken = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/drag.js' %}"></script>
+{% endblock content %}

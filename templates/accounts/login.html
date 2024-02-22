@@ -1,0 +1,34 @@
+{% extends "base_loggedout.html" %} {% load static %} {% block content %}
+
+<body class="login">
+    <div class="container">
+        <form method="post" class="form__container" action="{% url 'login' %}">
+            <h2>Sign In</h2>
+            {% csrf_token %}
+            <div class="form__group">
+                <label>Username or Email:</label>
+                {{ form.username }} {{ form.username.errors }}
+            </div>
+            <div class="form__group">
+                <label>{{ form.password.label_tag }}</label>
+                {{ form.password }} {{ form.password.errors }}
+            </div>
+
+            <a href="{% url 'password_reset' %}"><i>Forgot Password?</i></a>
+            <div class="form__actions">
+                <button type="submit" class="button">Sign In</button>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />
+        </form>
+        {% if form.errors %}
+        <div class="form__container form__message form__error">
+            {{ form.non_field_errors|striptags }}
+        </div>
+        {% elif next %}
+        <div class="form__message form__success">
+            Please login to see this page.
+        </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock content %}

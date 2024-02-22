@@ -1,0 +1,30 @@
+{% extends "base_loggedin.html" %} {% block content %}
+<div class="centred">
+    <form method="post" class="form__container">
+        <h3>
+            {% if new %}
+                New List for {{ board.title }}
+            {% else %}
+                Edit: {{ list.title }}
+            {% endif %}
+        </h3>
+        {% csrf_token %}
+        
+        {{ form.media }}
+        
+        <div class="form__group">
+            <label for="{{ form.title.id_for_label }}">List Title</label>
+            {{ form.title }}
+        </div>
+        
+        <div class="form__actions">
+            <a href="{% url 'single_board' board_id=board_id %}" type="button" class="button button__warning">
+                Cancel
+            </a>
+            <button type="submit" class="button">
+                Save
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
